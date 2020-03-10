@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bgs.dao.UserMapper">
+    <!--/*登录*/
+    boolean login(String username, String password);-->
+    <select id="login" resultType="cn.bgs.pojo.User">
+        select * from `user` where username=#{username} and password=#{password}
+    </select>
+<!--==============================华丽的分割线==============================-->
+    <!--/*用户全查*/
+    List<User> findAllUser();-->
+    <select id="findAllUser" resultType="cn.bgs.pojo.User">
+        select * from `user`
+    </select>
+<!--==============================华丽的分割线==============================-->
+    <!--/*用户删除*/
+    boolean delUser(int id);-->
+    <delete id="delUser">
+        delete from `user` where id=#{id}
+    </delete>
+<!--==============================华丽的分割线==============================-->
+    <!--/*用户添加*/
+    boolean addUser(User user);-->
+    <insert id="addUser">
+        insert into `user` values (null, #{username}, #{password}, #{sex}, #{phone})
+    </insert>
+<!--==============================华丽的分割线==============================-->
+    <!--/*用户修改*/
+    boolean updUser(User user);-->
+    <update id="updUser">
+        update `user` set username=#{username}, password=#{password}, sex=#{sex}, phone=#{phone} where id=#{id}
+    </update>
+</mapper>

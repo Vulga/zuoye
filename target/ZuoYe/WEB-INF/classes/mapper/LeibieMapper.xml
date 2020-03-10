@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bgs.dao.LeibieMapper">
+    <!--/*ztree查询类别*/
+    List<Leibie> getNode();-->
+    <select id="getNode" resultType="cn.bgs.pojo.Leibie">
+        select * from leibie;
+    </select>
+<!--==============================华丽的分割线==============================-->
+    <!--/*添加类别*/
+    boolean add(Leibie leibie);-->
+    <insert id="add" useGeneratedKeys="true" keyProperty="lid">
+        insert into leibie values (null, #{lname}, #{lpid})
+    </insert>
+<!--==============================华丽的分割线==============================-->
+    <!--/*删除类别*/
+    int delete(int lid);-->
+    <delete id="delete">
+        delete from leibie where lid=#{lid}
+    </delete>
+<!--==============================华丽的分割线==============================-->
+    <!--/*修改类别*/
+    boolean update(Leibie leibie);-->
+    <update id="update">
+        update leibie set lname=#{lname} where lid=#{lid}
+    </update>
+<!--==============================华丽的分割线==============================-->
+    <!--/*添加物品的下拉框，选择类别*/
+    List<Leibie> getSelect();-->
+    <select id="getSelect" resultType="cn.bgs.pojo.Leibie">
+        SELECT * from leibie where lpid not in (0,1)
+    </select>
+<!--==============================华丽的分割线==============================-->
+    <!--/*查询的下拉框*/
+    List<Leibie> getQuerySelect();-->
+    <select id="getQuerySelect" resultType="cn.bgs.pojo.Leibie">
+        SELECT * from leibie where lid
+    </select>
+</mapper>

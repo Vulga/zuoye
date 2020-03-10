@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bgs.dao.PlanMapper">
+    <!--/*申请出货*/
+    boolean add(Plan plan);-->
+    <insert id="add">
+        insert into plan values (null, #{pleibie}, #{pname}, #{pcount}, #{ptime}, 0, null)
+    </insert>
+<!--==============================华丽的分割线==============================-->
+    <!--/*审批 全查 pok==0*/
+    List<Plan> queryAll(VO flag);-->
+    <!--true 表示 出货记录查询 查询审批通过的 即pok==1-->
+    <resultMap id="qAll" type="cn.bgs.pojo.Plan">
+        <id property="pid" column="pid"></id>
+        <result property="pleibie" column="pleibie"></result>
+        <result property="pname" column="pname"></result>
+        <result property="pcount" column="pcount"></result>
+        <result property="ptime" column="ptime"></result>
+        <result property="pok" column="pok"></result>
+        <result property="reason" column="reason"></result>
+        <association property="leibie" javaType="cn.bgs.pojo.Leibie">
+            <id property="lid" column="lid"></id>
+            <result property="lname" column="lname"></result>
+            <result property="lpid" column="lpid"></result>
+        </association>
+    </resultMap>
+    <select id="queryAll" resultMap="qAll">
+        select * from plan p, leibie l where p.pleibie=l.lid
+        <if test="flag==false">
+            and p.pok=0
+        </if>
+        <if test="flag==true">
+            <if test="pname==null or pname==''">
+                and p.pok=1
+            </if>
+            <if test="pname!=null and pname!=''">
+                and p.pname like #{pname}
+            </if>
+        </if>
+    </select>
+<!--==============================华丽的分割线==============================-->
+    <!--/*非admin查看审核的记录，不通过的在重新申请*/
+    List<Plan> queryAll2();-->  <!-- and p.pok!=0-->
+    <select id="queryAll2" resultMap="qAll">
+        select * from plan p, leibie l where p.pleibie=l.lid
+    </select>
+<!--==============================华丽的分割线==============================-->
+    <!--/*审核出货*/
+    boolean ackPlan(Integer pcount, @Param("id") Integer id, @Param("pname") String pname, @Param("type") Integer type, @Param("reason") String reason);-->
+    <update id="ackPlan">
+        update plan set pok=#{type}
+        <if test="reason != null and reason != ''">
+            ,reason=#{reason}
+        </if>
+        where pid=#{id};
+
+        <if test="reason == null or reason == ''">
+            update wupin set wcount=wcount-#{pcount} where wname=#{pname};
+        </if>
+    </update>
+<!--==============================华丽的分割线==============================-->
+    <!--/*重新申请*/
+    boolean upd(Plan plan);-->
+    <update id="upd">
+        update plan set pleibie=#{pleibie},
+        pname=#{pname}, pcount=#{pcount}, ptime=#{ptime},
+        pok=0, reason=null
+        where pid=#{pid}
+    </update>
+<!--==============================华丽的分割线==============================-->
+    <!--/*统计图的，查看通过了的！！ pok==1*/
+    List<VO2> queryAllTJ(VO2 vo2);-->
+    <select id="queryAllTJ" resultType="cn.bgs.pojo.VO2">
+        select sum(pcount) `count`, pname pm from plan where pok=1 GROUP BY pname
+    </select>
+</mapper>

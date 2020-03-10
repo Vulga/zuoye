@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.bgs.dao.WupinMapper">
+    <!--/*物品全查*/
+    List<Wupin> lookWupinAll(@Param("lid") Integer lid, @Param("lname") String lname);-->
+    <resultMap id="all" type="cn.bgs.pojo.Wupin">
+        <id column="wid" property="wid"></id>
+        <result column="wlid" property="wlid"></result>
+        <result column="wname" property="wname"></result>
+        <result column="wcount" property="wcount"></result>
+        <result column="addTime" property="addTime"></result>
+        <association property="leibie" javaType="cn.bgs.pojo.Leibie">
+            <id column="lid" property="lid"></id>
+            <result column="lname" property="lname"></result>
+            <result column="lpid" property="lpid"></result>
+        </association>
+    </resultMap>
+    <select id="lookWupinAll" resultMap="all">
+        <if test="lid==null and lname==''">SELECT * from wupin w, leibie l where w.wlid=l.lid</if>
+
+        <if test="lid==1">
+                SELECT * from wupin w, leibie l where w.wlid=l.lid
+                <if test="lname!=''">
+                    and wname like #{lname}
+                </if>
+        </if>
+
+        <if test="lid!=null">
+            <if test="lid!=1">
+                SELECT * from wupin w, leibie l where w.wlid=l.lid and wlid=#{lid}
+            </if>
+            <if test="lname!=''">
+                and wname like #{lname}
+            </if>
+         </if>
+    </select>
+<!--==============================华丽的分割线==============================-->
+    <!--/*添加物品*/
+    boolean add(Wupin wupin);-->
+    <insert id="add">
+        insert into wupin values (null, #{wlid}, #{wname}, #{wcount}, #{addTime});
+    </insert>
+<!--==============================华丽的分割线==============================-->
+    <!--/*删除物品*/
+    boolean del(int wid);-->
+    <delete id="del">
+        delete from wupin where wid=#{wid}
+    </delete>
+<!--==============================华丽的分割线==============================-->
+    <!--/*修改物品*/
+    boolean upd(Wupin wupin);-->
+    <update id="upd">
+        update wupin set wlid=#{wlid}, wname=#{wname}, wcount=#{wcount}, addTime=#{addTime} where wid=#{wid}
+    </update>
+<!--==============================华丽的分割线==============================-->
+    <!--/*select 主类别查询*/
+    List<Wupin> lookWupinAll2(Integer lid);-->
+    <select id="lookWupinAll2" resultMap="all">
+        SELECT * from wupin w, leibie l where w.wlid=l.lid and wlid in (
+	        SELECT lid from leibie where lpid=#{lid}
+        )
+    </select>
+</mapper>
